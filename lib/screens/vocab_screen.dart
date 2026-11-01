@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
-class VocabScreen extends StatelessWidget {
+class VocabScreen extends StatefulWidget {
   const VocabScreen({super.key});
 
-  final List<Map<String, String>> words = [
+  @override
+  State<VocabScreen> createState() => _VocabScreenState();
+}
+
+class _VocabScreenState extends State<VocabScreen> {
+  final FlutterTts tts = FlutterTts();
+
+  static const List<Map<String, String>> words = [
     {"en": "apple", "cn": "苹果"},
     {"en": "banana", "cn": "香蕉"},
     {"en": "book", "cn": "书"},
@@ -15,6 +23,12 @@ class VocabScreen extends StatelessWidget {
     {"en": "school", "cn": "学校"},
     {"en": "water", "cn": "水"},
   ];
+
+  Future<void> speak(String text) async {
+    await tts.setLanguage("en-US");
+    await tts.setSpeechRate(0.45);
+    await tts.speak(text);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +42,17 @@ class VocabScreen extends StatelessWidget {
           return Card(
             elevation: 2,
             margin: const EdgeInsets.symmetric(vertical: 6),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    item["en"]!,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    item["cn"]!,
-                    style: const TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                ],
+            child: ListTile(
+              onTap: () => speak(item["en"]!),
+              title: Text(
+                item["en"]!,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
+              subtitle: Text(
+                item["cn"]!,
+                style: const TextStyle(fontSize: 16),
+              ),
+              trailing: const Icon(Icons.volume_up),
             ),
           );
         },
