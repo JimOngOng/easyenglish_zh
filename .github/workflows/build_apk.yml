@@ -1,20 +1,54 @@
-name: Build APK
+name: Build EasyEnglish APK (GitHub Only)
 on:
   push:
     branches: [ main ]
+  workflow_dispatch: # you can manually run this job from GitHub page
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Checkout your source code
+        uses: actions/checkout@v4
+        path: source_code
+
+      - name: Setup Java 17 (required for Android Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.24.0'
-      - run: flutter pub get
-      - run: flutter build apk --release
+          channel: stable
+
+      - name: Create fresh Flutter project (generates android/ folder)
+        run: |
+          flutter create -t app easyenglish_build
+          cd easyenglish_build
+
+      - name: Copy your source code into the new Flutter project
+        run: |
+          cd easyenglish_build
+          rm -rf lib assets pubspec.yaml
+          cp -r ../source_code/lib .
+          cp -r ../source_code/assets .
+          cp ../source_code/pubspec.yaml .
+
+      - name: Install dependencies
+        run: |
+          cd easyenglish_build
+          flutter pub get
+
+      - name: Build Release APK
+        run: |
+          cd easyenglish_build
+          flutter build apk --release
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EasyEnglish-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: EasyEnglish-Chinese-APK
+          path: easyenglish_build/build/app/outputs/flutter-apk/app-release.apk
