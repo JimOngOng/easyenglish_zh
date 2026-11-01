@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EasyEnglish + 中文',
+      title: 'EasyEnglish',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
